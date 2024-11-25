@@ -5,10 +5,46 @@ using System.Runtime.InteropServices.Marshalling;
 string inputName;
 string inputLastName;
 string inputAge;
-
+string inputHeight;
+string inputWeight;
 int convertedInputAge;
-
+float convertedInputHeight;
+float convertedInputWeight;
 bool isValidMain = false;
+
+do
+{
+    Console.WriteLine("Please enter the person's first name:");
+    inputName = Console.ReadLine();
+
+    Console.WriteLine("Please enter the person's last name:");
+    inputLastName = Console.ReadLine();
+
+    Console.WriteLine("Please enter the person's age:");
+    inputAge = Console.ReadLine();
+
+    Console.WriteLine("Please enter the person's height (in meters):");
+    inputHeight = Console.ReadLine();
+
+    Console.WriteLine("Please enter the person's weight (in kilograms):");
+    inputWeight = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(inputName) || string.IsNullOrWhiteSpace(inputLastName) || string.IsNullOrWhiteSpace(inputAge) || string.IsNullOrWhiteSpace(inputHeight) || string.IsNullOrWhiteSpace(inputWeight))
+    {
+        Console.WriteLine("All fields are required. Please try again.");
+        continue;
+    }
+    if (AreNamesValid(inputName, inputLastName) && IsAgeValid(inputAge) && AreDimmensionsValid(inputHeight, inputWeight))
+    {
+        isValidMain = true;
+        var person = new Person(inputName, inputLastName, convertedInputAge, convertedInputHeight, convertedInputWeight);
+        Console.WriteLine($"First Name:\t{person.FirstName}\nLast Name:\t{person.LastName}\nAge:\t\t{person.Age}\nHeight:\t\t{person.Height}m\nWeight:\t\t{person.Weight}kg");
+    }
+    else
+    {
+        Console.WriteLine("Please try again.");
+    }
+} while (!isValidMain);
 
 bool AreNamesValid(string inputName, string inputLastName)
 {
@@ -22,49 +58,46 @@ bool AreNamesValid(string inputName, string inputLastName)
     }
     return true;
 }
-bool AgeIsValid(string inputAge)
+
+bool IsAgeValid(string inputAge)
 {
     if (int.TryParse(inputAge, out convertedInputAge))
     {
-        if (convertedInputAge >= 18 && convertedInputAge <= 120)
+        if (convertedInputAge >= ValidationConstants.minAge && convertedInputAge <= ValidationConstants.maxAge)
         {
             return true;
         }
         else
         {
-            Console.WriteLine("Person's age cannot be less than 18 years and more than 120 years.");
+            Console.WriteLine($"Person's age cannot be less than {ValidationConstants.minAge} years and more than {ValidationConstants.maxAge} years.");
             return false;
         }
-
     }
     Console.WriteLine("Age must be an integer.");
     return false;
 }
 
-do
+bool AreDimmensionsValid(string inputHeight, string inputWeight) 
 {
-    Console.WriteLine("Please enter the person's first name:");
-    inputName = Console.ReadLine();
-
-    Console.WriteLine("Please enter the person's last name:");
-    inputLastName = Console.ReadLine();
-
-    Console.WriteLine("Please enter the person's age:");
-    inputAge = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(inputName) || string.IsNullOrWhiteSpace(inputLastName) || string.IsNullOrWhiteSpace(inputAge))
+    bool isHeightValid = float.TryParse(inputHeight, out convertedInputHeight) && convertedInputHeight >= ValidationConstants.minHeight && convertedInputHeight <= ValidationConstants.maxHeight;
+    if (!isHeightValid) 
     {
-        Console.WriteLine("All fields are required. Please try again.");
-        continue;
+        Console.WriteLine($"Person's height cannot be less than {ValidationConstants.minHeight} and more than {ValidationConstants.maxHeight} meters.");
     }
-    if (AreNamesValid(inputName, inputLastName) && AgeIsValid(inputAge))
+    bool isWeightValid = float.TryParse(inputWeight, out convertedInputWeight) && convertedInputWeight >= ValidationConstants.minWeight && convertedInputWeight <= ValidationConstants.maxWeight;
+    if (!isWeightValid)
     {
-        isValidMain = true;
-        var person = new Person(inputName, inputLastName, convertedInputAge);
-        Console.WriteLine($"First Name: {person.FirstName}\nLast Name: {person.LastName}\nAge: {person.Age}");
+        Console.WriteLine($"Person's weight cannot be less than {ValidationConstants.minWeight} and more than {ValidationConstants.maxWeight} kilograms.");
     }
-    else
-    {
-        Console.WriteLine("Please try again.");
-    }
-} while (!isValidMain);
+    return isHeightValid && isWeightValid;
+}
+
+static class ValidationConstants
+{
+    public const int minAge = 18;
+    public const int maxAge = 120;
+    public const float maxHeight = 2.30f;
+    public const float minHeight = 0.90f;
+    public const float maxWeight = 210.00f;
+    public const float minWeight = 30.00f;
+}
