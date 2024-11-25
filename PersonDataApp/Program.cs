@@ -2,76 +2,69 @@
 using System;
 using System.Runtime.InteropServices.Marshalling;
 
-Console.WriteLine("Please enter the person's first name:");
-string inputName = Console.ReadLine();
+string inputName;
+string inputLastName;
+string inputAge;
 
-Console.WriteLine("Please enter the person's last name:");
-string inputLastName = Console.ReadLine();
+int convertedInputAge;
 
-Console.WriteLine("Please enter the person's age:");
-string inputAge = Console.ReadLine();
+bool isValidMain = false;
 
-int ageResult = int.Parse(inputAge);
-
-bool inputValidation = true;
-
-foreach(char c in inputName) 
+bool AreNamesValid(string inputName, string inputLastName)
 {
-    int ageValidation;
-    if (!Char.IsLetter(c))
+    foreach (char c in inputName + inputLastName)
     {
-        inputValidation = false;
-        Console.WriteLine("The name cannot contain special characters or numbers.");
-        break;
-
-    } else if (Char.IsLetter(c)) 
-    { 
-        foreach(char d in inputLastName) 
+        if (!Char.IsLetter(c))
         {
-            if (!Char.IsLetter(d)) 
-            {
-                inputValidation = false;
-                Console.WriteLine("The last name cannot contain special characters or numbers.");
-                break;
-            }
+            Console.WriteLine("Names cannot contain special characters or numbers.");
+            return false;
         }
-    } else if (!int.TryParse(inputAge, out ageValidation))
-    {
-            inputValidation = false;
-            Console.WriteLine("Age must be an integer.");
-        break;
     }
+    return true;
+}
+bool AgeIsValid(string inputAge)
+{
+    if (int.TryParse(inputAge, out convertedInputAge))
+    {
+        if (convertedInputAge >= 18 && convertedInputAge <= 120)
+        {
+            return true;
+        }
+        else
+        {
+            Console.WriteLine("Person's age cannot be less than 18 years and more than 120 years.");
+            return false;
+        }
+
+    }
+    Console.WriteLine("Age must be an integer.");
+    return false;
 }
 
-if (inputValidation)
+do
 {
-    var person = new Person(inputName, inputLastName, ageResult);
-    Console.WriteLine($"{person.FirstName + '\t' + person.LastName + '\t' + person.Age}");
-    switch (inputName)
+    Console.WriteLine("Please enter the person's first name:");
+    inputName = Console.ReadLine();
+
+    Console.WriteLine("Please enter the person's last name:");
+    inputLastName = Console.ReadLine();
+
+    Console.WriteLine("Please enter the person's age:");
+    inputAge = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(inputName) || string.IsNullOrWhiteSpace(inputLastName) || string.IsNullOrWhiteSpace(inputAge))
     {
-        case string name:
-            Console.WriteLine($"Added person's name: \"{name}\".");
-            break;
-        default:
-            Console.WriteLine("Please enter the person's name again.");
-            break;
+        Console.WriteLine("All fields are required. Please try again.");
+        continue;
     }
-    switch (inputLastName)
+    if (AreNamesValid(inputName, inputLastName) && AgeIsValid(inputAge))
     {
-        case string name:
-            Console.WriteLine($"Added person's last name: \"{name}\".");
-            break;
-        default:
-            Console.WriteLine("Please enter the person's last name again.");
-            break;
+        isValidMain = true;
+        var person = new Person(inputName, inputLastName, convertedInputAge);
+        Console.WriteLine($"First Name: {person.FirstName}\nLast Name: {person.LastName}\nAge: {person.Age}");
     }
-    switch (inputAge)
+    else
     {
-        case string age:
-            Console.WriteLine($"Added person's age: \"{age}\".");
-            break;
-        default:
-            Console.WriteLine("Please enter the person's age again.");
-            break;
+        Console.WriteLine("Please try again.");
     }
-}
+} while (!isValidMain);
