@@ -29,16 +29,31 @@ do
     Console.WriteLine("Please enter the person's weight (in kilograms):");
     inputWeight = Console.ReadLine();
 
-    if (string.IsNullOrWhiteSpace(inputName) || string.IsNullOrWhiteSpace(inputLastName) || string.IsNullOrWhiteSpace(inputAge) || string.IsNullOrWhiteSpace(inputHeight) || string.IsNullOrWhiteSpace(inputWeight))
+    string[] inputs = { inputName, inputLastName, inputAge, inputHeight, inputWeight };
+
+    bool allFieldsFilled = true;
+
+    for (int i = 0; i < inputs.Length; i++)
     {
-        Console.WriteLine("All fields are required. Please try again.");
+        if (string.IsNullOrWhiteSpace(inputs[i]))
+        {
+            Console.WriteLine("All fields are required. Please try again.");
+            allFieldsFilled = false;
+            break;
+        }
+    }
+
+    if (!allFieldsFilled) 
+    {
         continue;
     }
+
     if (AreNamesValid(inputName, inputLastName) && IsAgeValid(inputAge) && AreDimmensionsValid(inputHeight, inputWeight))
     {
         isValidMain = true;
         var person = new Person(inputName, inputLastName, convertedInputAge, convertedInputHeight, convertedInputWeight);
-        Console.WriteLine($"First Name:\t{person.FirstName}\nLast Name:\t{person.LastName}\nAge:\t\t{person.Age}\nHeight:\t\t{person.Height}m\nWeight:\t\t{person.Weight}kg");
+        float bmi = CalculateBMI(person.Height, person.Weight);
+        Console.WriteLine($"First Name:\t{person.FirstName}\nLast Name:\t{person.LastName}\nAge:\t\t{person.Age}\nHeight:\t\t{person.Height}m\nWeight:\t\t{person.Weight}kg\nBMI:\t\t{bmi:N2}");
     }
     else
     {
@@ -48,15 +63,20 @@ do
 
 bool AreNamesValid(string inputName, string inputLastName)
 {
-    foreach (char c in inputName + inputLastName)
+    if(inputName.Length >= 2 && inputLastName.Length >= 2) 
     {
-        if (!Char.IsLetter(c))
+        foreach (char c in inputName + inputLastName)
         {
-            Console.WriteLine("Names cannot contain special characters or numbers.");
-            return false;
+            if (!Char.IsLetter(c))
+            {
+                Console.WriteLine("Names cannot contain special characters or numbers.");
+                return false;
+            }
         }
+        return true;
     }
-    return true;
+    Console.WriteLine($"Name and last name need to be at least 2 characters long.");
+    return false;
 }
 
 bool IsAgeValid(string inputAge)
@@ -90,6 +110,11 @@ bool AreDimmensionsValid(string inputHeight, string inputWeight)
         Console.WriteLine($"Person's weight cannot be less than {ValidationConstants.minWeight} and more than {ValidationConstants.maxWeight} kilograms.");
     }
     return isHeightValid && isWeightValid;
+}
+
+float CalculateBMI(float convertedInputHeight, float convertedInputWeight) 
+{
+    return convertedInputWeight / (convertedInputHeight * convertedInputHeight);
 }
 
 static class ValidationConstants
