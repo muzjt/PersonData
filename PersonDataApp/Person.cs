@@ -4,6 +4,12 @@ using System.ComponentModel;
 
 namespace PersonDataApp
 {
+    public enum UserStatus
+    {
+        Active,
+        Inactive,
+        Banned
+    }
     internal class Person
     {
         public string FirstName { get; set; }
@@ -11,7 +17,7 @@ namespace PersonDataApp
         public int Age { get; set; }
         public float Height { get; set; }
         public float Weight { get; set; }
-
+        public UserStatus Status { get; set; }
 
         public Person(string firstName, string lastName, int age, float height, float weight)
         {
@@ -20,6 +26,7 @@ namespace PersonDataApp
             Age = age;
             Height = height;
             Weight = weight;
+            Status = UserStatus.Active;
         }
 
     }
