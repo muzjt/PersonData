@@ -1,4 +1,4 @@
-﻿using System;
+﻿
 namespace PersonDataApp
 {
     internal class Program
@@ -12,11 +12,14 @@ namespace PersonDataApp
             {
                 Console.WriteLine("\n--- User Management Menu ---");
                 Console.WriteLine("1. Add a person");
-                Console.WriteLine("2. Display users");
-                Console.WriteLine("3. Remove a person");
-                Console.WriteLine("4. Calculate BMI fo a user");
-                Console.WriteLine("5. Change user status");
-                Console.WriteLine("6. Exit");
+                Console.WriteLine("2. Add an athlete");
+                Console.WriteLine("3. Display users");
+                Console.WriteLine("4. Display athletes");
+                Console.WriteLine("5. Remove a person");
+                Console.WriteLine("6. Calculate BMI fo a user");
+                Console.WriteLine("7. Change user status");
+                Console.WriteLine("8. Display contact information");
+                Console.WriteLine("9. Exit");
                 Console.Write("Choose an option: ");
                 string choice = Console.ReadLine();
 
@@ -30,34 +33,109 @@ namespace PersonDataApp
                     string lastName = Console.ReadLine();
 
                     Console.WriteLine("Enter age: ");
-                    if (!int.TryParse(Console.ReadLine(), out int age))
+                    if (!int.TryParse(Console.ReadLine(), out int age) || age <= 0)
                     {
-                        Console.WriteLine("Invalid age. Please try again.");
+                        Console.WriteLine("Invalid age, it must be a positive integer.");
                         break;
                     }
 
                     Console.WriteLine("Enter height (in meters): ");
                     if (!float.TryParse(Console.ReadLine(), out float height))
                     {
-                        Console.WriteLine("Invalid height. Please try again.");
+                        Console.WriteLine("Invalid height, it must be a positive number.");
                         break;
                     }
 
                     Console.WriteLine("Enter weight (in kilograms): ");
                     if (!float.TryParse(Console.ReadLine(), out float weight))
                     {
-                        Console.WriteLine("Invalid weight. Please try again.");
+                        Console.WriteLine("Invalid weight, it must be a positive number.");
                         break;
                     }
 
-                    manager.AddPerson(firstName, lastName, age, height, weight);
+                    Console.WriteLine("Do you want to add contact information? (yes/no): ");
+                    string addContactInfo = Console.ReadLine()?.ToLower();
+                    
+                    if(addContactInfo == "yes") 
+                        {
+                            Console.WriteLine("Enter phone number: ");
+                            string phoneNumber = Console.ReadLine();
+
+                            Console.WriteLine("Enter email address: ");
+                            string email = Console.ReadLine();
+
+                            manager.AddPerson(firstName, lastName, age, height, weight, phoneNumber, email);
+                        }
+                    else
+                        {
+                            manager.AddPerson(firstName, lastName, age, height, weight);
+                        }
+                    
                     break;
 
                     case "2":
-                        manager.DisplayUsers();
+                        Console.WriteLine("Enter first name: ");
+                        string athleteFirstName = Console.ReadLine();
+
+                        Console.WriteLine("Enter last name: ");
+                        string athleteLastName = Console.ReadLine();
+
+                        Console.WriteLine("Enter age: ");
+                        if (!int.TryParse(Console.ReadLine(), out int athleteAge))
+                        {
+                            Console.WriteLine("Invalid age. Please try again.");
+                            break;
+                        }
+
+                        Console.WriteLine("Enter height (in meters): ");
+                        if (!float.TryParse(Console.ReadLine(), out float athleteHeight))
+                        {
+                            Console.WriteLine("Invalid height. Please try again.");
+                            break;
+                        }
+
+                        Console.WriteLine("Enter weight (in kilograms): ");
+                        if (!float.TryParse(Console.ReadLine(), out float athleteWeight))
+                        {
+                            Console.WriteLine("Invalid weight. Please try again.");
+                            break;
+                        }
+
+                        Console.WriteLine("Enter sport: ");
+                        string sport = Console.ReadLine();
+
+                        Console.WriteLine("Enter best performance: ");
+                        string bestPerformance = Console.ReadLine();
+
+                        Console.WriteLine("Do you want to add contact information? (yes/no): ");
+                        string addAthleteContact = Console.ReadLine()?.ToLower();
+
+                        if (addAthleteContact == "yes") 
+                        {
+                            Console.WriteLine("Enter phone number: ");
+                            string athletePhoneNumber = Console.ReadLine();
+
+                            Console.WriteLine("Enter email adress: ");
+                            string athleteEmail = Console.ReadLine();
+
+                            manager.AddAthlete(athleteFirstName, athleteLastName, athleteAge, athleteHeight, athleteWeight, sport, bestPerformance, athletePhoneNumber, athleteEmail);
+                        }
+                        else 
+                        {
+                            manager.AddAthlete(athleteFirstName, athleteLastName, athleteAge, athleteHeight, athleteWeight, sport, bestPerformance);
+                        }
+
                         break;
 
                     case "3":
+                        manager.DisplayUsers();
+                        break;
+
+                    case "4":
+                        manager.DisplayAthletes();
+                        break;
+
+                    case "5":
                         Console.WriteLine("Enter first name of user to remove: ");
                         string removeFirstName = Console.ReadLine();
 
@@ -67,7 +145,7 @@ namespace PersonDataApp
                         manager.RemovePerson(removeFirstName, removeLastName);
                         break;
 
-                    case "4":
+                    case "6":
                         Console.WriteLine("Enter first name of user to calculate BMI: ");
                         string bmiFirstName = Console.ReadLine();
 
@@ -77,7 +155,7 @@ namespace PersonDataApp
                         manager.CalculateAndSaveBMI(bmiFirstName, bmiLastName);
                         break;
 
-                    case "5":
+                    case "7":
                         Console.WriteLine("Enter first name of the user to change status: ");
                         string statusFirstName = Console.ReadLine();
 
@@ -90,7 +168,11 @@ namespace PersonDataApp
                         manager.ChangeUserStatus(statusFirstName, statusLastName, newStatus);
                         break;
 
-                    case "6":
+                    case "8":
+                        manager.DisplayContactInfo();
+                        break;
+
+                    case "9":
                         exit = true;
                         Console.WriteLine("Exiting...");
                         break;
