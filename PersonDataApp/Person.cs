@@ -7,7 +7,7 @@ namespace PersonDataApp
         Inactive,
         Banned
     }
-    internal class Person
+    public abstract class Person
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -19,7 +19,7 @@ namespace PersonDataApp
         public string Email { get; set; }
 
 
-        public Person(string firstName, string lastName, int age, float height, float weight, string phoneNumber, string email)
+        protected Person(string firstName, string lastName, int age, float height, float weight, string phoneNumber, string email)
         {
             FirstName = firstName;
             LastName = lastName;
@@ -31,7 +31,7 @@ namespace PersonDataApp
             Email = email;
         }
 
-        public Person(string firstName, string lastName, int age, float height, float weight)
+        protected Person(string firstName, string lastName, int age, float height, float weight)
         {
             FirstName = firstName;
             LastName = lastName;
@@ -42,6 +42,10 @@ namespace PersonDataApp
             PhoneNumber = "N/A";
             Email = "N/A";
         }
+
+        public abstract string GetPersonSpecificInfo();
+
+        public abstract string GetPersonInfo();
 
     }
 }

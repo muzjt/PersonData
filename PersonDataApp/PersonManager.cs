@@ -1,43 +1,48 @@
 ﻿
 namespace PersonDataApp
 {
-    internal class PersonManager
+    public class PersonManager
     {
         private List<Person> users = new List<Person>();
         private readonly string userFilePath = "users.txt";
+        public PersonManager(string filePath = "users.txt")
+        {
+            userFilePath = filePath;
+            LoadUsersFromFile();
+        }
 
         public PersonManager() 
         {
             LoadUsersFromFile();
         }
 
-        public void AddPerson(string firstName, string lastName, int age, float height, float weight, string phoneNumber, string email) 
+        public void AddCustomer(string firstName, string lastName, int age, float height, float weight, string phoneNumber, string email) 
         {
-            var person = new Person(firstName, lastName, age, height, weight, phoneNumber, email);
+            var person = new Customer(firstName, lastName, age, height, weight, phoneNumber, email);
             users.Add(person);
-            Console.WriteLine($"Added new user {firstName} {lastName}");
+            Console.WriteLine($"Added new customer {firstName} {lastName}");
             SaveUsersToFile();
         }
 
-        public void AddPerson(string firstName, string lastName, int age, float height, float weight)
+        public void AddCustomer(string firstName, string lastName, int age, float height, float weight)
         {
-            var person = new Person(firstName, lastName, age, height, weight, "N/A", "N/A");
+            var person = new Customer(firstName, lastName, age, height, weight);
             users.Add(person);
-            Console.WriteLine($"Added new user {firstName} {lastName}");
+            Console.WriteLine($"Added new customer {firstName} {lastName}");
             SaveUsersToFile();
         }
 
-        public void AddAthlete(string firstName, string lastName, int age, float height, float weight, string sport, string bestPerformance, string phoneNumber, string email) 
+        public void AddAthlete(string firstName, string lastName, int age, float height, float weight, string sport, string bestPerformance) 
         {
-            var athlete = new Athlete(firstName, lastName, age, height, weight, sport, bestPerformance, phoneNumber, email);
+            var athlete = new Athlete(firstName, lastName, age, height, weight, sport, bestPerformance);
             users.Add(athlete);
             Console.WriteLine($"Added new athlete {firstName} {lastName}");
             SaveUsersToFile();
         }
 
-        public void AddAthlete(string firstName, string lastName, int age, float height, float weight, string sport, string bestPerformance)
+        public void AddAthlete(string firstName, string lastName, int age, float height, float weight)
         {
-            var athlete = new Athlete(firstName, lastName, age, height, weight, sport, bestPerformance);
+            var athlete = new Athlete(firstName, lastName, age, height, weight);
             users.Add(athlete);
             Console.WriteLine($"Added new athlete {firstName} {lastName}");
             SaveUsersToFile();
@@ -53,31 +58,71 @@ namespace PersonDataApp
             Console.WriteLine("\n--- List of Users ---");
             foreach(var user in users) 
             {
-                Console.WriteLine($"{user.FirstName} {user.LastName}, Age: {user.Age}, Height: {user.Height}m, Weight: {user.Weight}kg, Status: {user.Status}");
+                Console.WriteLine($"{user.FirstName} {user.LastName}, Status: {user.Status}");
             }
         }
 
-        public void DisplayAthletes() 
+        public void DisplayAthletes()
         {
             var athletes = users.OfType<Athlete>().ToList();
             if (athletes.Count == 0)
             {
-                Console.WriteLine("No athletes do display.");
+                Console.WriteLine("No athletes to display.");
                 return;
             }
 
             Console.WriteLine("\n--- List of Athletes ---");
             foreach (var athlete in athletes)
             {
-                Console.WriteLine($"{athlete.FirstName} {athlete.LastName}, Age: {athlete.Age}, Sport: {athlete.Sport}, Best performance: {athlete.BestPerformance}");
+                Console.WriteLine($"{athlete.GetPersonInfo()}");
             }
         }
 
-        public void DisplayContactInfo()
+        public void DisplayCustomers()
         {
-            foreach(var person in users) 
+            var customers = users.OfType<Customer>().ToList();
+            if (customers.Count == 0)
             {
-                Console.WriteLine($"{person.FirstName} {person.LastName} - Phone: {person.PhoneNumber}, Email: {person.Email}");
+                Console.WriteLine("No customers to display.");
+                return;
+            }
+
+            Console.WriteLine("\n--- List of Customers ---");
+            foreach (var customer in customers)
+            {
+                Console.WriteLine($"{customer.GetPersonInfo()}");
+            }
+        }
+
+        public void DisplayAthleteSportDetails()
+        {
+            var athletes = users.OfType<Athlete>().ToList();
+            if (athletes.Count == 0)
+            {
+                Console.WriteLine("No athletes sport details to display.");
+                return;
+            }
+
+            Console.WriteLine("\n--- List of Athletes ---");
+            foreach (var athlete in athletes)
+            {
+                Console.WriteLine($"{athlete.GetPersonSpecificInfo()}");
+            }
+        }
+
+        public void DisplayCustomerContactDetails ()
+        {
+            var customers = users.OfType<Customer>().ToList();
+            if (customers.Count == 0)
+            {
+                Console.WriteLine("No customers contact details to display.");
+                return;
+            }
+
+            Console.WriteLine("\n--- List of Customers ---");
+            foreach (var customer in customers)
+            {
+                Console.WriteLine($"{customer.GetPersonSpecificInfo()}");
             }
         }
 
@@ -116,13 +161,20 @@ namespace PersonDataApp
             }
         }
 
-        private void SaveUsersToFile() 
+        private void SaveUsersToFile()
         {
-            using (var writer = new StreamWriter(userFilePath)) 
-            { 
-                foreach (var user in users) 
+            using (var writer = new StreamWriter(userFilePath))
+            {
+                foreach (var user in users)
                 {
-                    writer.WriteLine($"{user.FirstName};{user.LastName};{user.Age};{user.Height};{user.Weight};{user.Status};{user.PhoneNumber};{user.Email}");
+                    if (user is Customer customer)
+                    {
+                        writer.WriteLine($"Customer;{customer.FirstName};{customer.LastName};{customer.Age};{customer.Height};{customer.Weight};{customer.Status};{customer.PhoneNumber};{customer.Email}");
+                    }
+                    else if (user is Athlete athlete)
+                    {
+                        writer.WriteLine($"Athlete;{athlete.FirstName};{athlete.LastName};{athlete.Age};{athlete.Height};{athlete.Weight};{athlete.Status};{athlete.Sport};{athlete.BestPerformance}");
+                    }
                 }
             }
             Console.WriteLine("User data saved to file.");
@@ -144,33 +196,43 @@ namespace PersonDataApp
                     while ((line = reader.ReadLine()) != null)
                     {
                         var parts = line.Split(';');
-
-                        if (parts.Length != 8)
+                        if (parts.Length < 6)
                         {
                             Console.WriteLine($"Invalid data format in line: {line}");
                             continue;
                         }
 
-                        try
-                        {
-                            string firstName = parts[0];
-                            string lastName = parts[1];
-                            int age = int.Parse(parts[2]);
-                            float height = float.Parse(parts[3]);
-                            float weight = float.Parse(parts[4]);
-                            UserStatus status = Enum.Parse<UserStatus>(parts[5]);
-                            string phoneNumber = parts[6];
-                            string email = parts[7];
+                        string userType = parts[0];
+                        string firstName = parts[1];
+                        string lastName = parts[2];
+                        int age = int.Parse(parts[3]);
+                        float height = float.Parse(parts[4]);
+                        float weight = float.Parse(parts[5]);
+                        UserStatus status = Enum.Parse<UserStatus>(parts[6]);
 
-                            var person = new Person(firstName, lastName, age, height, weight, phoneNumber, email)
+                        if (userType == "Customer" && parts.Length >= 8)
+                        {
+                            string phoneNumber = parts[7];
+                            string email = parts[8];
+                            var customer = new Customer(firstName, lastName, age, height, weight, phoneNumber, email)
                             {
                                 Status = status
                             };
-                            users.Add(person);
+                            users.Add(customer);
                         }
-                        catch (Exception ex)
+                        else if (userType == "Athlete" && parts.Length >= 8)
                         {
-                            Console.WriteLine($"Error parsing line: {line}. Exception: {ex.Message}");
+                            string sport = parts[7];
+                            string personalRecord = parts[8];
+                            var athlete = new Athlete(firstName, lastName, age, height, weight, sport, personalRecord)
+                            {
+                                Status = status
+                            };
+                            users.Add(athlete);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Unrecognized user type or invalid data: {line}");
                         }
                     }
                 }

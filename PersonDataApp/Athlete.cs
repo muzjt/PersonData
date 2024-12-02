@@ -1,26 +1,32 @@
 ﻿
 namespace PersonDataApp
 {
-    internal class Athlete : Person
+    public class Athlete : Person
     {
         public string Sport { get; set; }
         public string BestPerformance { get; set; }
 
-        public Athlete(string firstName, string lastname, int age, float height, float weight, string sport, string bestPerformance, string phoneNumber, string email) : base(firstName, lastname, age, height, weight, phoneNumber, email)
+        public Athlete(string firstName, string lastName, int age, float height, float weight, string sport, string bestPerformance) 
+            : base(firstName, lastName, age, height, weight)
         {
             Sport = sport;
             BestPerformance = bestPerformance;
         }
 
-        public Athlete(string firstName, string lastname, int age, float height, float weight, string sport, string bestPerformance) : base(firstName, lastname, age, height, weight)
+        public Athlete(string firstName, string lastName, int age, float height, float weight)
+            : this(firstName, lastName, age, height, weight, "N/A", "N/A")
         {
-            Sport = sport;
-            BestPerformance = bestPerformance;
         }
 
-        public override string ToString()
+        public override string GetPersonSpecificInfo()
         {
-            return $"{base.ToString()}, Sport: {Sport}, Best Performance: {BestPerformance}";
+            return $"{FirstName} {LastName}, sport: {Sport}, personal record: {BestPerformance}";
         }
+
+        public override string GetPersonInfo()
+        {
+            return $"{FirstName} {LastName}, age: {Age}, height: {Height}, weight: {Weight}";
+        }
+
     }
 }
